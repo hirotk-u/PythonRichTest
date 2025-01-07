@@ -1,30 +1,98 @@
 ﻿from rich.console import Console
 from rich.table import Table
 from rich.progress import track
-import time
+import requests
+import json
+
+#
+#郵便番号検索APIを利用して、郵便番号から住所を取得する
+#
+
+#定数定義
+RESULTS = "results"
+
+CLM_ADDRESS1 = "address1"
+CLM_ADDRESS2 = "address2"
+CLM_ADDRESS3 = "address3"
+CLM_KANA1 = "kana1"
+CLM_KANA2 = "kana2"
+CLM_KANA3 = "kana3"
+CLM_CODE = "code"
+CLM_ZIPCODE = "zipcode"
 
 def main():
-    """
-    main関数
-    """
     console = Console()
-    createTable(console)
-    createProgress()
+    zipcode = input_zipcode()
+    r = get_address(zipcode)
 
-def createTable(console):
-    # テーブルの紹介
-    table = Table(show_header=True, header_style="bold magenta", title="ToDos")
-    table.add_column("Date", style="dim", width=12)
-    table.add_column("Title")
-    table.add_column("Tags", justify="right")
-    table.add_row("2021-08-01", "Finish rich tutorial", "python,rich")
-    table.add_row("2021-08-02", "Write article", "python,rich")
+    if r:
+        table = create_result_table(r)
+        console.print(table)
 
-    console.print(table)
 
-def createProgress():
-    for n in track(range(100), description="Processing..."):
-        time.sleep(0.05)
+#郵便番号入力受付
+def input_zipcode():
+
+    while(True):
+
+        #ユーザ入力受付
+        print("郵便番号を数字7桁で入力してください")
+        zipcode = input()
+    
+        #数値チェック
+        is_int = zipcode.isdigit()
+
+        #桁数チェック
+        zip_len = len(zipcode)
+        
+        if is_int and zip_len == 7:
+            break
+
+    return zipcode
+
+
+#郵便番号から住所取得
+def get_address(zipcode):
+    try:
+        r = requests.get("https://zipcloud.ibsnet.co.jp/api/search?zipcode=" + zipcode)
+
+        if r.status_code == 200:
+            print("Request successful")
+        else:
+            print("Request failed")
+
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
+        r = None
+    return r
+
+
+#結果テーブル作成
+def create_result_table(r):
+    json_dict = json.loads(r.text)
+
+    table = Table(show_header=True, header_style="bold magenta", title="Results")
+
+    #ヘッダ部作成
+    for key in json_dict[RESULTS][0]:
+        table.add_column(key, style="dim", width=20)
+
+    #データ部作成
+    val_list = []
+    for val in json_dict[RESULTS][0].values():
+        val_list.append(val)
+
+    table.add_row(val_list[0]
+                    ,val_list[1]
+                    ,val_list[2]
+                    ,val_list[3]
+                    ,val_list[4]
+                    ,val_list[5]
+                    ,val_list[6]
+                    ,val_list[7])
+
+    return table
+
 
 if __name__ == "__main__":
     main()
