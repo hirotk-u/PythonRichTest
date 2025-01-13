@@ -20,6 +20,9 @@ CLM_KANA3 = "kana3"
 CLM_CODE = "code"
 CLM_ZIPCODE = "zipcode"
 
+#----------------------
+#メイン処理
+#----------------------
 def main():
     console = Console()
     zipcode = input_zipcode()
@@ -29,8 +32,9 @@ def main():
         table = create_result_table(r)
         console.print(table)
 
-
+#----------------------
 #郵便番号入力受付
+#----------------------
 def input_zipcode():
 
     while(True):
@@ -50,8 +54,9 @@ def input_zipcode():
 
     return zipcode
 
-
+#----------------------
 #郵便番号から住所取得
+#----------------------
 def get_address(zipcode):
     try:
         r = requests.get("https://zipcloud.ibsnet.co.jp/api/search?zipcode=" + zipcode)
@@ -66,8 +71,9 @@ def get_address(zipcode):
         r = None
     return r
 
-
+#----------------------
 #結果テーブル作成
+#----------------------
 def create_result_table(r):
     json_dict = json.loads(r.text)
 
@@ -93,7 +99,15 @@ def create_result_table(r):
 
     return table
 
-
+#----------------------
+#呼び出し判定
+#----------------------
 if __name__ == "__main__":
+    # このコードはファイルが直接実行された場合にのみ実行されます
+    print("This file was run directly")
     main()
     input() #待ち状態にする
+
+else:
+    # このコードはファイルがモジュールとしてインポートされた場合にのみ実行されます
+    print("This file was imported as a module")
