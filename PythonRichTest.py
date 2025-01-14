@@ -84,18 +84,9 @@ def create_result_table(r):
         table.add_column(key, style="dim", width=20)
 
     #データ部作成
-    val_list = []
-    for val in json_dict[RESULTS][0].values():
-        val_list.append(val)
-
-    table.add_row(val_list[0]
-                    ,val_list[1]
-                    ,val_list[2]
-                    ,val_list[3]
-                    ,val_list[4]
-                    ,val_list[5]
-                    ,val_list[6]
-                    ,val_list[7])
+    val_list = list(json_dict[RESULTS][0].values())
+    
+    table.add_row(*val_list)
 
     return table
 
